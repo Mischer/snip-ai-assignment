@@ -1,0 +1,29 @@
+# --- Node.js ---
+node_modules/
+npm-debug.log*
+
+# production
+dist/
+build/
+out/
+
+# env-файлы
+.env
+.env.local
+.env.*.local
+
+# --- TypeScript ---
+*.tsbuildinfo
+
+# --- JetBrains IDE  ---
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# --- macOS ---
+.DS_Store
+
+# --- misc ---
+*.log
+coverage/
