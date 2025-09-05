@@ -1,5 +1,5 @@
-import {Article} from '../entities/article.js';
+import { Article } from '../entities/article.js';
 
 export interface NewsSourcePort {
-  fetchLatest(limit: number, sourceRef?: string): Promise<Article[]>;
+    fetchLatest(limit: number, sourceRef?: string): Promise<Article[]>;
 }
