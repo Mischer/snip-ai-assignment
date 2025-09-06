@@ -2,20 +2,28 @@
 node_modules/
 npm-debug.log*
 
-# production
+# --- Build output ---
 dist/
 build/
 out/
 
-# env-файлы
-.env
+# --- App builds inside apps/*
+apps/**/dist/
+apps/**/build/
+apps/**/out/
+
+# --- Environment files ---
+apps/backend/.env
 .env.local
 .env.*.local
+apps/**/.env
+apps/**/.env.local
+apps/**/.env.*.local
 
 # --- TypeScript ---
 *.tsbuildinfo
 
-# --- JetBrains IDE  ---
+# --- JetBrains IDE ---
 .idea/
 *.iml
 *.ipr
@@ -24,6 +32,6 @@ out/
 # --- macOS ---
 .DS_Store
 
-# --- misc ---
+# --- Misc ---
 *.log
 coverage/

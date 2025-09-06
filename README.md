@@ -1,19 +1,9 @@
-# Snips AI Assignment (Express + TypeScript)
+# Snips Monorepo
 
-A small backend service built with **Node.js 22 + Express + TypeScript**.  
-The project will fetch sports news articles (via RSS) and enrich them with the OpenAI API.
+## Apps
+- `apps/backend` — Express + TypeScript (NodeNext)
 
-## Quick Start
-
-```bash
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Build the project
-npm run build
-
-# Run compiled code
-npm start
+## Commands (run from repo root)
+- `npm run dev` — start backend in watch mode
+- `npm run build` — build backend
+- `npm run start` — run compiled backend
