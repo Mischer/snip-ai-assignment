@@ -13,15 +13,20 @@ export class NewsController {
         const { limit, feedUrl } = this.parseQuery(req);
 
         try {
-            const articles = await this.newsService.getArticles(limit, feedUrl);
+            const items = await this.newsService.getArticles(limit, feedUrl);
+
+            const mapped = items.map((a) => ({
+                realTitle: a.realTitle,
+                fakeTitle: a.fakeTitle,
+                category: a.category,
+                url: a.url,
+                source: a.source,
+                publishedAt: a.publishedAt.toISOString(),
+            }));
+
             return res.json({
-                items: articles.map((article) => ({
-                    realTitle: article.realTitle,
-                    url: article.url,
-                    source: article.source,
-                    publishedAt: article.publishedAt.toISOString(),
-                })),
-                meta: { count: articles.length, durationMs: Date.now() - startedAt },
+                items: mapped,
+                meta: { count: mapped.length, durationMs: Date.now() - startedAt, enriched: true },
             });
         } catch (err: any) {
             logger.error('GET /news failed', { message: err?.message, stack: err?.stack });
