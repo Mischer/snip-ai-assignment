@@ -1,8 +1,11 @@
-import { RssNewsSource } from '../infra/sources/rss.news-source.js';
 import { NewsService } from '../services/news.service.js';
 import { NewsController } from '../api/controllers/news.controller.js';
 import { MemoryCache } from '../infra/cache/memory.cache.js';
 import { OpenAiEnrichment } from '../infra/enrichment/openai.enrichment.js';
+import { SourceResolver } from '../infra/sources/source-strategy.resolver.js';
+import { RssSourceStrategyImpl } from '../infra/sources/rss-source-strategy.impl.js';
+import { JsonFeedSourceStrategyImpl } from '../infra/sources/json-source-strategy.impl.js';
+
 import { Token, TOKENS } from './tokens.js';
 
 interface Disposable {
@@ -40,11 +43,18 @@ export function buildContainer() {
 
     const container = new Container();
 
-    const rss = new RssNewsSource();
     const enrichment = new OpenAiEnrichment(process.env.OPENAI_API_KEY);
+    const rss = new RssSourceStrategyImpl();
+    const json = new JsonFeedSourceStrategyImpl();
+    const resolver = new SourceResolver([rss, json]);
+
     const cache = new MemoryCache();
-    const newsService = new NewsService(rss, enrichment, cache);
+    const newsService = new NewsService(resolver, enrichment, cache);
     const newsController = new NewsController(newsService);
+
+    container.register(TOKENS.RssSourceStrategy, rss);
+    container.register(TOKENS.JsonFeedSourceStrategy, json);
+    container.register(TOKENS.SourceResolver, resolver);
 
     container.register(TOKENS.NewsService, newsService);
     container.register(TOKENS.NewsController, newsController);
