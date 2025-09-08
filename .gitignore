@@ -14,10 +14,10 @@ apps/**/out/
 
 # --- Environment files ---
 apps/backend/.env
-.env.local
+apps/web/.env
 .env.*.local
 apps/**/.env
-apps/**/.env.local
+apps/web/.env
 apps/**/.env.*.local
 
 # --- TypeScript ---

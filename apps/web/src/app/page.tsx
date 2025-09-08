@@ -1,138 +1,101 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from "react";
+import SearchBar from "../components/SearchBar";
+import NewsCard from "../components/NewsCard";
+import SkeletonCard from "../components/SkeletonCard";
+import EmptyState from "../components/EmptyState";
 
 type Article = {
   realTitle: string;
-  fakeTitle: string;
-  category: 'Politics' | 'Sports' | 'Technology' | 'Other';
+  fakeTitle?: string;
+  category?: string;
   url: string;
   source: string;
-  publishedAt: string; // ISO
+  publishedAt: string;
 };
 
-type ApiResponse = {
-  items: Article[];
-  meta: { count: number; durationMs: number; enriched: boolean };
-};
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE?.replace(/\/$/, "") || "http://localhost:3000";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:3000';
-
-export default function Page() {
-  const [limit, setLimit] = useState<number>(10);
-  const [source, setSource] = useState<string>('');
-  const [data, setData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+export default function Home() {
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [meta, setMeta] = useState<{ enriched?: boolean; durationMs?: number } | null>(null);
+  const [items, setItems] = useState<Article[]>([]);
 
-  async function load() {
-    setLoading(true);
-    setError(null);
-    setData(null);
+  const load = async ({ limit, source }: { limit: number; source?: string }) => {
     try {
-      const params = new URLSearchParams();
-      params.set('limit', String(limit));
-      if (source.trim()) params.set('source', source.trim());
+      setLoading(true);
+      setError(null);
 
-      // если настроил next.config переписывать /api → на бэк, можно использовать '/api/news?...'
-      const res = await fetch(`${API_BASE}/news?` + params.toString(), {
-        headers: { Accept: 'application/json' },
-      });
+      const qs = new URLSearchParams({
+        limit: String(limit),
+        ...(source ? { source } : {}),
+      }).toString();
 
-      if (!res.ok) {
-        setError(`API error: ${res.status}`);
-        return;
-      }
+      const res = await fetch(`${API_BASE}/news?${qs}`);
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      const json = (await res.json()) as ApiResponse;
-      setData(json);
-      // eslint-disable-next-line
+      const data = await res.json();
+      setItems(data?.items ?? []);
+      setMeta(data?.meta ?? null);
     } catch (e: any) {
-      setError(e?.message ?? 'Network error');
+      setItems([]);
+      setMeta(null);
+      setError(e?.message || "Failed to load");
     } finally {
       setLoading(false);
     }
-  }
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   return (
-    <main className="container">
-      <h1 className="title">Snips News</h1>
-
-      <div className="toolbar">
-        <div className="field">
-          <label>Limit</label>
-          <input
-            type="number"
-            min={1}
-            max={50}
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
-          />
+    <main>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <h1 className="title">Snips News</h1>
         </div>
-
-        <div className="field grow">
-          <label>Source (RSS URL, optional)</label>
-          <input
-            type="url"
-            placeholder="https://feeds.bbci.co.uk/sport/rss.xml"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          />
-        </div>
-
-        <button onClick={load} className="btn">Load</button>
       </div>
 
-      {loading && <div className="card muted">Loading…</div>}
-      {error && (
-        <div className="card error">
-          <b>Error</b>
-          <div>{error}</div>
-          <button onClick={load} className="btn small">Retry</button>
-        </div>
-      )}
+      <div className="container">
+        <SearchBar loading={loading} onSubmit={load} />
 
-      {!loading && !error && data && data.items.length === 0 && (
-        <div className="card muted">No articles found.</div>
-      )}
-
-      {!loading && !error && data && data.items.length > 0 && (
-        <>
+        {meta && (
           <div className="meta">
-            <span>Enriched: {String(data.meta.enriched)}</span>
-            <span>•</span>
-            <span>Fetched in {data.meta.durationMs} ms</span>
+            <span className="badge badge-green">{meta.enriched ? "Enriched" : "Raw"}</span>
+            <span className="dot" />
+            {typeof meta.durationMs === "number" && (
+              <span>Fetched in {meta.durationMs} ms</span>
+            )}
           </div>
+        )}
 
-          <div className="grid">
-            {data.items.map((a, idx) => (
-              <a key={`${a.url}-${idx}`} href={a.url} target="_blank" rel="noreferrer" className="news">
-                <div className="news-header">
-                  <span className={`badge ${badgeClass(a.category)}`}>{a.category}</span>
-                  <span className="news-source">{a.source}</span>
-                </div>
-                <div className="news-fake">{a.fakeTitle}</div>
-                <div className="news-real" title={a.realTitle}>{a.realTitle}</div>
-                <div className="news-date">{new Date(a.publishedAt).toLocaleString()}</div>
-              </a>
-            ))}
+        {error && (
+          <div className="card error" style={{ marginBottom: 12 }}>
+            {error}
           </div>
-        </>
-      )}
+        )}
+
+        <div className="grid">
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : items.length === 0 ? (
+            <EmptyState />
+          ) : (
+            items.map((a, idx) => (
+              <NewsCard
+                key={idx}
+                title={a.realTitle}
+                subtitle={a.fakeTitle}
+                url={a.url}
+                source={a.source}
+                category={a.category}
+                publishedAt={a.publishedAt}
+              />
+            ))
+          )}
+        </div>
+      </div>
     </main>
   );
-}
-
-function badgeClass(c: Article['category']): string {
-  switch (c) {
-    case 'Sports': return 'badge-green';
-    case 'Technology': return 'badge-blue';
-    case 'Politics': return 'badge-red';
-    default: return 'badge-gray';
-  }
 }
