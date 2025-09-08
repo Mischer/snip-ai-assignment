@@ -40,10 +40,11 @@ export default function Home() {
       const data = await res.json();
       setItems(data?.items ?? []);
       setMeta(data?.meta ?? null);
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to load";
       setItems([]);
       setMeta(null);
-      setError(e?.message || "Failed to load");
+      setError(message);
     } finally {
       setLoading(false);
     }

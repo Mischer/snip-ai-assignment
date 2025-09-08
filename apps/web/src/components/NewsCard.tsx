@@ -2,9 +2,9 @@ type Props = {
   title: string;
   subtitle?: string;
   url: string;
-  source: string;
+  source?: string;
   category?: string;
-  publishedAt: string; // ISO
+  publishedAt: string;
 };
 
 export default function NewsCard({
@@ -15,7 +15,7 @@ export default function NewsCard({
                                    category,
                                    publishedAt,
                                  }: Props) {
-  const host = new URL(url).hostname.replace(/^www\./, "");
+  const host = source || new URL(url).hostname.replace(/^www\./, "");
   const date = new Date(publishedAt).toLocaleString();
 
   return (
@@ -26,9 +26,7 @@ export default function NewsCard({
       </div>
 
       <div className="news-title">{title}</div>
-
       {subtitle && <div className="news-fake">{subtitle}</div>}
-
       <div className="news-real">{date}</div>
     </a>
   );
