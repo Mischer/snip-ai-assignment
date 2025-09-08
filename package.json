@@ -21,6 +21,8 @@
     "lint:fix": "npm run lint:fix --workspace apps/backend && npm run lint:fix --workspace apps/web --if-present",
     "format": "npm run format --workspace apps/backend && npm run format --workspace apps/web --if-present",
 
+    "test:e2e": "npm run test:e2e --workspace apps/backend",
+
     "clean": "rimraf apps/*/dist"
   },
   "devDependencies": {
