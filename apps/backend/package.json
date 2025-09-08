@@ -1,40 +1,43 @@
 {
-  "name": "snips-ai-assignment",
+  "name": "snips-ai-backend",
   "version": "1.0.0",
   "description": "Express + TypeScript backend for news enrichment with OpenAI",
-  "main": "dist/server.js",
+  "author": "Mikhail Kultiyasov <mischer86@gmail.com>",
   "type": "module",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc -p .",
     "start": "node dist/server.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier --write 'src/**/*.{ts,js,json,md}'"
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "axios": "1.11.0",
-    "cors": "^2.8.5",
+    "cors": "2.8.5",
     "dotenv": "16.4.5",
     "express": "5.1.0",
     "fast-xml-parser": "5.2.5",
     "lodash": "4.17.21",
     "winston": "3.17.0",
-    "zod": "^4.1.5"
+    "zod": "4.1.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
-    "@types/cors": "^2.8.19",
+    "@eslint/js": "9.34.0",
+    "@types/cors": "2.8.19",
     "@types/express": "5.0.3",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "4.17.20",
     "@types/node": "22.14.0",
-    "@typescript-eslint/eslint-plugin": "^8.42.0",
-    "@typescript-eslint/parser": "^8.42.0",
-    "eslint": "^9.34.0",
-    "eslint-config-prettier": "^9.1.2",
-    "globals": "^15.15.0",
+    "@typescript-eslint/eslint-plugin": "8.42.0",
+    "@typescript-eslint/parser": "8.42.0",
+    "eslint": "9.34.0",
+    "eslint-config-prettier": "9.1.2",
+    "globals": "15.15.0",
     "prettier": "3.6.2",
-    "ts-node-dev": "2.0.0",
-    "typescript": "5.9.2"
+    "tsx": "4.20.5",
+    "typescript": "5.9.2",
+    "rimraf": "6.0.1"
   }
 }

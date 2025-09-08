@@ -1,16 +1,30 @@
 {
   "name": "snips-ai-assignment",
   "private": true,
+  "description": "Monorepo for Snips AI assignment (backend + frontend)",
+  "author": "Mikhail Kultiyasov <mischer86@gmail.com>",
   "workspaces": [
     "apps/*"
   ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "dev": "npm run dev -w apps/backend",
-    "dev:web": "npm run dev -w apps/web",
-    "dev:all": "npm run dev -w apps/backend & npm run dev -w apps/web",
-    "build": "npm run build -ws",
-    "start": "npm run start -w apps/backend",
-    "lint": "npm run lint -w apps/backend",
-    "format": "npm run format -w apps/backend"
+    "dev": "npm run dev --workspace apps/backend",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:all": "concurrently -k -n backend,web -c auto \"npm:dev --workspace=apps/backend\" \"npm:dev --workspace=apps/web\"",
+
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace apps/backend",
+
+    "lint": "npm run lint --workspace apps/backend && npm run lint --workspace apps/web --if-present",
+    "lint:fix": "npm run lint:fix --workspace apps/backend && npm run lint:fix --workspace apps/web --if-present",
+    "format": "npm run format --workspace apps/backend && npm run format --workspace apps/web --if-present",
+
+    "clean": "rimraf apps/*/dist"
+  },
+  "devDependencies": {
+    "concurrently": "9.1.2",
+    "rimraf": "6.0.1"
   }
 }
